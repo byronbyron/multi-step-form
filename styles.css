@@ -148,6 +148,59 @@ button {
     display: none;
 }
 
+.form-plan .form-check {
+    margin-bottom: 0.75rem;
+}
+
+.form-plan .form-check-label {
+    display: block;
+    padding: 1rem;
+    border: 1px solid var(--light-gray);
+    border-radius: 0.5rem;
+    display: flex;
+    cursor: pointer;
+}
+
+.plan-icon {
+    display: block;
+    margin-right: 0.875rem;
+}
+
+.plan-name {
+    font-weight: 500;
+    color: var(--marine-blue);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.plan-price {
+    font-size: 0.875rem;
+    display: block;
+    color: var(--cool-gray);
+}
+
+.form-plan input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.form-plan input[type="radio"]:checked + .form-check-label {
+    border-color: #554f96;
+    background-color: hsl(245deg 31% 45% / 6%);
+}
+
+.form-plan .form-check-label:hover,
+.form-plan input[type="radio"]:focus + .form-check-label {
+    border-color: #554f96;
+}
+
 .form-step.active {
     display: block;
 }
