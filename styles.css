@@ -209,10 +209,6 @@ button {
     display: block;
 }
 
-.form-toggle {
-
-}
-
 .toggle {
     display: flex;
     align-items: center;
@@ -220,7 +216,7 @@ button {
     cursor: pointer;
     gap: 1rem;
     background-color: var(--magnolia);
-    padding: 0.5rem;
+    padding: 0.75rem;
     border-radius: 0.5rem;
     position: relative;
 }
@@ -231,6 +227,7 @@ button {
     width: 100%;
     height: 100%;
     margin: 0;
+    z-index: -1;
 }
 
 .toggle-display {
@@ -283,6 +280,10 @@ button {
 .toggle[aria-pressed="true"] .toggle-display::before,
 .toggle-input:checked + .toggle-display::before {
     transform: translate(100%, -50%);
+}
+
+.toggle-monthly {
+    order: -1;
 }
 
 .form-buttons {
@@ -459,7 +460,21 @@ button:disabled {
         border-radius: 0.5rem;
     }
 
-    .next-step {
-        
+    .form-plan {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-plan .form-check {
+        flex: 1;
+    }
+
+    .form-plan .form-check-label {
+        display: block;
+    }
+
+    .plan-icon {
+        margin-bottom: 2rem;
     }
 }
