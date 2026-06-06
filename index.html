@@ -1,198 +1,383 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
 
-    <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+#msf{font-family:'Ubuntu',sans-serif;background:#EFF5FF;min-height:660px;display:flex;flex-direction:column}
 
-    <title>Frontend Mentor | Multi-step form</title>
+/* ── DESKTOP ── */
+@media(min-width:600px){
+  #msf{align-items:center;justify-content:center;padding:2rem 1rem;height:100%}
+  .mobile-header{display:none}
+  .desktop-shell{display:grid;grid-template-columns:274px 1fr;width:100%;max-width:860px;background:#fff;border-radius:16px;box-shadow:0 25px 40px -15px rgba(0,0,0,.15);overflow:hidden;min-height:568px}
+  .sidebar{position:relative;border-radius:10px 0 0 10px;overflow:hidden;flex-shrink:0}
+  .sidebar-bg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .sidebar-steps{position:relative;z-index:2;padding:2.5rem 2rem;display:flex;flex-direction:column;gap:2rem}
+  .main{padding:3.5rem 4rem 2rem;display:flex;flex-direction:column;background:#fff}
+  .mobile-card{display:contents}
+  .mob-nav{display:none}
+  .desk-nav{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;margin-top:auto}
+}
 
-    <link rel="stylesheet" href="./styles.css">
-</head>
-<body>
+/* ── MOBILE ── */
+@media(max-width:599px){
+  #msf{flex-direction:column;padding:0;position:relative;min-height:700px}
+  .desktop-shell{display:flex;flex-direction:column;flex:1;width:100%}
+  .sidebar{display:none}
+  .mobile-header{display:block;position:relative;height:172px;overflow:hidden;flex-shrink:0}
+  .mh-bg{width:100%;height:100%;display:block;object-fit:cover}
+  .mh-steps{position:absolute;top:0;left:0;right:0;display:flex;justify-content:center;gap:1rem;padding:2rem 1rem 0}
+  .si-num{width:33px;height:33px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;transition:background .2s,border-color .2s,color .2s;font-family:'Ubuntu',sans-serif}
+  .si-num.active{background:#BEE2FD;border-color:#BEE2FD;color:#022959}
+  .main{flex:1;display:flex;flex-direction:column;padding:0 0 80px;background:transparent}
+  .mobile-card{background:#fff;border-radius:12px;margin:-40px 1rem 0;padding:1.5rem;position:relative;z-index:2;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+  .desk-nav{display:none}
+  .mob-nav{display:flex;justify-content:space-between;align-items:center;position:fixed;bottom:0;left:0;right:0;padding:1rem 1.5rem;background:#fff;z-index:10}
+}
 
-    <main class="main">
-        <aside class="sidebar container">
-            <ol class="steps-list">
-                <li class="active">
-                    <span>Step 1</span>
-                    <span>Your info</span>
-                </li>
+/* ── SHARED sidebar desktop ── */
+.si{display:flex;align-items:center;gap:1rem}
+.si .si-num{width:33px;height:33px;border-radius:50%;border:1px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;transition:background .2s,border-color .2s,color .2s}
+.si.active .si-num{background:#BEE2FD;border-color:#BEE2FD;color:#022959}
+.si-meta{display:flex;flex-direction:column;gap:2px}
+.si-label{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;font-weight:400}
+.si-name{font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em}
 
-                <li>
-                    <span>Step 2</span>
-                    <span>Select plan</span>
-                </li>
+/* ── PANELS ── */
+.panels{flex:1;display:flex;flex-direction:column}
+.panel{display:none;flex-direction:column;gap:1.2rem;flex:1}
+.panel.active{display:flex}
+.ptitle{font-size:28px;font-weight:700;color:#022959;line-height:1.1}
+.psub{font-size:15px;color:#9699AA;line-height:1.5}
+@media(max-width:599px){.ptitle{font-size:24px}.psub{font-size:14px}}
 
-                <li>
-                    <span>Step 3</span>
-                    <span>Add-ons</span>
-                </li>
+/* ── FIELDS ── */
+.field{display:flex;flex-direction:column;gap:5px}
+.field-row{display:flex;justify-content:space-between;align-items:center}
+.field label{font-size:13px;font-weight:500;color:#022959}
+.field-err{font-size:12px;font-weight:700;color:#EE374A;display:none}
+.field input{width:100%;border:1px solid #D6D9E6;border-radius:8px;padding:11px 16px;font-size:15px;font-family:'Ubuntu',sans-serif;color:#022959;outline:none;transition:border-color .15s}
+.field input::placeholder{color:#9699AA}
+.field input:focus{border-color:#483EFF}
+.field input.err{border-color:#EE374A}
 
-                <li>
-                    <span>Step 4</span>
-                    <span>Summary</span>
-                </li>
-            </ol>
-        </aside>
+/* ── PLAN CARDS desktop (3-col grid) ── */
+@media(min-width:600px){
+  .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .pc{border:1px solid #D6D9E6;border-radius:8px;padding:18px 16px;cursor:pointer;display:flex;flex-direction:column;gap:32px;transition:border-color .15s,background .15s}
+  .pc-icon-row{display:block}
+  .pc-inner{display:block}
+  .pc-name{font-size:16px;font-weight:700;color:#022959;margin-top:4px}
+  .pc-price{font-size:14px;color:#9699AA;margin-top:2px}
+  .pc-save{font-size:13px;color:#022959;margin-top:2px;display:none}
+}
+/* ── PLAN CARDS mobile (row layout) ── */
+@media(max-width:599px){
+  .plan-grid{display:flex;flex-direction:column;gap:12px}
+  .pc{border:1px solid #D6D9E6;border-radius:8px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:row;align-items:center;gap:14px;transition:border-color .15s,background .15s}
+  .pc-icon-row{flex-shrink:0}
+  .pc-inner{flex:1}
+  .pc-name{font-size:15px;font-weight:700;color:#022959}
+  .pc-price{font-size:13px;color:#9699AA;margin-top:1px}
+  .pc-save{font-size:12px;color:#022959;margin-top:2px;display:none}
+}
+.pc:hover{border-color:#483EFF}
+.pc.sel{border-color:#483EFF;background:#F8F9FF}
 
-        <div class="container form-container">
-            <form action="" id="form" class="form">
-                <div class="form-step active">
-                    <div class="text">
-                        <h2>Personal info</h2>
-                        <p>Please provide your name, email address, and phone number.</p>
-                    </div>
-    
-                    <div class="form-group">
-                        <label class="form-label" for="name">Name</label>
-                        <input class="form-control" type="text" name="name" placeholder="e.g. Stephen King">
-                    </div>
-    
-                    <div class="form-group">
-                        <label class="form-label" for="email">Email Address</label>
-                        <input class="form-control" type="text" name="email" placeholder="e.g. stephenking@lorem.com">
-                    </div>
-    
-                    <div class="form-group ">
-                        <label class="form-label" for="phone">Phone Number</label>
-                        <input class="form-control form-control-error" type="text" name="phone" placeholder="e.g. +1 234 567 890">
-                        <span class="form-message">This field is required</span>
-                    </div>
+/* ── TOGGLE ── */
+.tog-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;background:#F8F9FF;border-radius:8px;padding:14px}
+.tog-lbl{font-size:14px;font-weight:700;color:#9699AA;transition:color .15s}
+.tog-lbl.on{color:#022959}
+.toggle{width:40px;height:20px;background:#022959;border-radius:10px;position:relative;cursor:pointer;flex-shrink:0}
+.tog-thumb{width:12px;height:12px;background:#fff;border-radius:50%;position:absolute;top:4px;left:4px;transition:transform .2s}
+.toggle.yr .tog-thumb{transform:translateX(20px)}
 
-                    <div class="form-buttons">
-                        <button type="button" class="next-step">Next Step</button>
-                    </div>
-                </div>
-    
-                <div class="form-step">
-                    <div class="text">
-                        <h2>Select your plan</h2>
-                        <p>You have the option of monthly or yearly billing.</p>
-                    </div>
-                    
-                    <div class="form-plan">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="plan" id="arcade" value="arcade">
-                            <label class="form-check-label" for="arcade">
-                                <img src="./assets/images/icon-arcade.svg" alt="arcade" class="plan-icon">
-                                <span>
-                                    <span class="plan-name">Arcade</span>
-                                    <span class="plan-price">$9/mo</span>
-                                </span>
-                            </label>
-                        </div>
-        
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="plan" id="advanced" value="arcade">
-                            <label class="form-check-label" for="advanced">
-                                <img src="./assets/images/icon-advanced.svg" alt="arcade" class="plan-icon">
-                                <span>
-                                    <span class="plan-name">Advanced</span>
-                                    <span class="plan-price">$12/mo</span>
-                                </span>
-                            </label>
-                        </div>
-        
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="plan" id="pro" value="pro">
-                            <label class="form-check-label" for="pro">
-                                <img src="./assets/images/icon-pro.svg" alt="arcade" class="plan-icon">
-                                <span>
-                                    <span class="plan-name">Pro</span>
-                                    <span class="plan-price">$15/mo</span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-    
-                    <div>
-                        <label class="toggle" for="toggle">
-                            <input type="checkbox" name="toggle" id="toggle" class="toggle-input" checked="">
-                            <span class="toggle-display" hidden></span>
-                            <span class="toggle-monthly">Monthly</span>
-                            <span class="toggle-yearly">Yearly</span>
-                        </label>
-                    </div>
-    
-                    <div class="form-buttons">
-                        <button type="button" class="prev-step">Go Back</button>
-                        <button type="button" class="next-step">Next Step</button>
-                    </div>
-                </div>
-    
-                <div class="form-step">
-                    <div class="text">
-                        <h2>Pick add-ons</h2>
-                        <p>Add-ons help enhance your gaming experience.</p>
-                    </div>
-            
-                    <div class="form-check">
-                        <label class="form-check-label" for="online_service">
-                            <span>Online service</span>
-                            <span>Access to multiplayer games</span>
-                            <span>+$1/mo</span>
-                        </label>
-                        <input class="form-check-input" type="checkbox" value="online_service" id="online_service">
-                    </div>
-                    
-                    <div class="form-check">
-                        <label class="form-check-label" for="larger_storage">
-                            <span>Larger storage</span>
-                            <span>Extra 1TB of cloud save</span>
-                            <span>+$2/mo</span>
-                        </label>
-                        <input class="form-check-input" type="checkbox" value="larger_storage" id="larger_storage">
-                    </div>
-            
-                    <div class="form-check">
-                        <label class="form-check-label" for="customizable_profile">
-                            <span>Customizable Profile</span>
-                            <span>Custom theme on your profile</span>
-                            <span>+$2/mo</span>
-                        </label>
-                        <input class="form-check-input" type="checkbox" value="customizable_profile" id="customizable_profile">
-                    </div>
-    
-                    <div class="form-buttons">
-                        <button type="button" class="prev-step">Go Back</button>
-                        <button type="button" class="next-step">Next Step</button>
-                    </div>
-                </div>
-    
-                <div class="form-step">
-                    <div class="text">
-                        <h2>Finishing up</h2>
-                        <p>Double-check everything looks OK before confirming.</p>
-                    </div>
-    
-                    <!-- Dynamically add subscription and add-on selections here -->
-    
-                    <p>Total (per month/year)</p>
-    
-                    <div class="form-buttons">
-                        <button type="button" class="prev-step">Go Back</button>
-                        <button type="button" class="next-step">Confirm</button>
-                    </div>
-                </div>
-    
-                <div class="form-step">
-                    <div class="text">
-                        <h2>Thank you!</h2>
-    
-                        <p>Thanks for confirming your subscription! We hope you have fun using our platform. If you ever need support, please feel free to email us at support@loremgaming.com.</p>
-                    </div>
-                </div>
-            </form>
+/* ── ADD-ONS ── */
+.addon-list{display:flex;flex-direction:column;gap:12px}
+.ac{border:1px solid #D6D9E6;border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:18px;cursor:pointer;transition:border-color .15s,background .15s}
+@media(max-width:599px){.ac{padding:12px 16px;gap:14px}}
+.ac:hover{border-color:#483EFF}
+.ac.sel{border-color:#483EFF;background:#F8F9FF}
+.achk{width:20px;height:20px;border-radius:4px;border:1.5px solid #D6D9E6;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s}
+.ac.sel .achk{background:#483EFF;border-color:#483EFF}
+.ac-info{flex:1}
+.ac-name{font-size:14px;font-weight:700;color:#022959}
+.ac-desc{font-size:13px;color:#9699AA;margin-top:2px}
+.ac-price{font-size:14px;color:#483EFF;font-weight:500;white-space:nowrap}
+
+/* ── SUMMARY ── */
+.sum-box{background:#F8F9FF;border-radius:8px;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+@media(max-width:599px){.sum-box{padding:16px}}
+.sum-top{display:flex;justify-content:space-between;align-items:flex-start}
+.sum-plan{font-size:15px;font-weight:700;color:#022959}
+.sum-change{font-size:14px;color:#9699AA;text-decoration:underline;cursor:pointer;margin-top:4px;display:block}
+.sum-plan-price{font-size:15px;font-weight:700;color:#022959}
+.sum-div{height:1px;background:#D6D9E6}
+.sum-addon-row{display:flex;justify-content:space-between}
+.sum-aname{font-size:14px;color:#9699AA}
+.sum-aprice{font-size:14px;color:#022959}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:0 24px;margin-top:4px}
+@media(max-width:599px){.total-row{padding:0 4px}}
+.total-lbl{font-size:14px;color:#9699AA}
+.total-val{font-size:20px;font-weight:700;color:#483EFF}
+
+/* ── CONFIRM ── */
+.conf{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.5rem;flex:1;padding:2rem 0}
+.conf.active{display:flex}
+.conf p{font-size:15px;color:#9699AA;max-width:300px;line-height:1.6}
+
+/* ── BUTTONS ── */
+.btn-back{background:none;border:none;font-family:'Ubuntu',sans-serif;font-size:15px;font-weight:500;color:#9699AA;cursor:pointer;padding:8px 0}
+.btn-back:hover{color:#022959}
+.btn-back.inv{visibility:hidden;pointer-events:none}
+.btn-next{background:#022959;color:#fff;border:none;border-radius:8px;font-family:'Ubuntu',sans-serif;font-size:15px;font-weight:700;padding:14px 28px;cursor:pointer;transition:background .15s;margin-left:auto}
+.btn-next:hover{background:#483EFF}
+.btn-next.confirm{background:#483EFF}
+.btn-next.confirm:hover{background:#3932cc}
+</style>
+
+<div id="msf">
+
+  <!-- MOBILE HEADER (hidden on desktop) -->
+  <div class="mobile-header">
+    <svg class="mh-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 172" preserveAspectRatio="xMidYMid slice">
+      <rect width="375" height="172" fill="#483EFF"/>
+      <path fill="#6259FF" fill-rule="evenodd" d="M-30 140C10 230 175 270 215 200c40-70-60-85-100-160C75-35 45-80-10-63s-55 113-20 203Z" clip-rule="evenodd"/>
+      <path fill="#F9818E" fill-rule="evenodd" d="M310 195c60-28 90-140 40-168s-55 48-105 76-80 50-67 88 72 32 132 4Z" clip-rule="evenodd"/>
+      <path stroke="#fff" stroke-linecap="round" stroke-linejoin="bevel" stroke-width="4" d="m218 112 10-10M255 118l-12-10M236 130l-7 15"/>
+      <circle cx="20" cy="155" r="67" fill="#FFAF7E"/>
+    </svg>
+    <div class="mh-steps">
+      <div class="si-num active" id="mn1">1</div>
+      <div class="si-num" id="mn2">2</div>
+      <div class="si-num" id="mn3">3</div>
+      <div class="si-num" id="mn4">4</div>
+    </div>
+  </div>
+
+  <div class="desktop-shell">
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+      <svg class="sidebar-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 274 568" preserveAspectRatio="xMidYMid slice">
+        <rect width="274" height="568" fill="#483EFF" rx="10"/>
+        <mask id="sbm2" width="274" height="568" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><rect width="274" height="568" fill="#fff" rx="10"/></mask>
+        <g mask="url(#sbm2)">
+          <path fill="#6259FF" fill-rule="evenodd" d="M-34.692 543.101C3.247 632.538 168.767 685.017 211.96 612.52c43.194-72.497-66.099-85.653-104.735-160.569-38.635-74.916-68.657-121.674-124.482-104.607-55.824 17.068-55.375 106.32-17.436 195.757Z" clip-rule="evenodd"/>
+          <path fill="#F9818E" fill-rule="evenodd" d="M233.095 601.153c60.679-28.278 92.839-143.526 41.875-171.528-50.965-28.003-57.397 47.579-108.059 75.987-50.662 28.408-82.14 50.207-69.044 88.241 13.096 38.034 74.549 35.578 135.228 7.3Z" clip-rule="evenodd"/>
+          <path stroke="#fff" stroke-linecap="round" stroke-linejoin="bevel" stroke-width="5" d="m165.305 469.097 10.607-10.806M209.461 474.581l-12.506-10.503M187.56 488.991l-6.908 14.798"/>
+          <path fill="#FFAF7E" d="M.305 546.891c37.003 0 67-29.997 67-67s-29.997-67-67-67-67 29.997-67 67 29.997 67 67 67Z"/>
+        </g>
+      </svg>
+      <div class="sidebar-steps">
+        <div class="si active" data-s="1"><div class="si-num">1</div><div class="si-meta"><span class="si-label">Step 1</span><span class="si-name">Your info</span></div></div>
+        <div class="si" data-s="2"><div class="si-num">2</div><div class="si-meta"><span class="si-label">Step 2</span><span class="si-name">Select plan</span></div></div>
+        <div class="si" data-s="3"><div class="si-num">3</div><div class="si-meta"><span class="si-label">Step 3</span><span class="si-name">Add-ons</span></div></div>
+        <div class="si" data-s="4"><div class="si-num">4</div><div class="si-meta"><span class="si-label">Step 4</span><span class="si-name">Summary</span></div></div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+      <div class="mobile-card">
+        <div class="panels">
+
+          <div class="panel active" id="s1">
+            <h1 class="ptitle">Personal info</h1>
+            <p class="psub">Please provide your name, email address, and phone number.</p>
+            <div class="field"><div class="field-row"><label for="fn">Name</label><span class="field-err" id="en">This field is required</span></div><input id="fn" type="text" placeholder="e.g. Stephen King"></div>
+            <div class="field"><div class="field-row"><label for="fe">Email Address</label><span class="field-err" id="ee">Please enter a valid email</span></div><input id="fe" type="email" placeholder="e.g. stephenking@lorem.com"></div>
+            <div class="field"><div class="field-row"><label for="fp">Phone Number</label><span class="field-err" id="ep">This field is required</span></div><input id="fp" type="tel" placeholder="e.g. +1 234 567 890"></div>
+          </div>
+
+          <div class="panel" id="s2">
+            <h1 class="ptitle">Select your plan</h1>
+            <p class="psub">You have the option of monthly or yearly billing.</p>
+            <div class="plan-grid">
+              <div class="pc sel" data-plan="arcade">
+                <div class="pc-icon-row"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="none" fill-rule="evenodd"><circle cx="20" cy="20" r="20" fill="#FFAF7E"/><path fill="#FFF" fill-rule="nonzero" d="M24.995 18.005h-3.998v5.998h-2v-5.998H15a1 1 0 0 0-1 1V29a1 1 0 0 0 1 1h9.995a1 1 0 0 0 1-1v-9.995a1 1 0 0 0-1-1Zm-5.997 8.996h-2v-1.999h2v2Zm2-11.175a2.999 2.999 0 1 0-2 0v2.18h2v-2.18Z"/></g></svg></div>
+                <div class="pc-inner"><div class="pc-name">Arcade</div><div class="pc-price" id="p-arcade">$9/mo</div><div class="pc-save" id="sv-arcade">2 months free</div></div>
+              </div>
+              <div class="pc" data-plan="advanced">
+                <div class="pc-icon-row"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="none" fill-rule="evenodd"><circle cx="20" cy="20" r="20" fill="#F9818E"/><path fill="#FFF" fill-rule="nonzero" d="M25.057 15H14.944C12.212 15 10 17.03 10 19.885c0 2.857 2.212 4.936 4.944 4.936h10.113c2.733 0 4.943-2.08 4.943-4.936S27.79 15 25.057 15ZM17.5 20.388c0 .12-.108.237-.234.237h-1.552v1.569c0 .126-.138.217-.259.217H14.5c-.118 0-.213-.086-.213-.203v-1.583h-1.569c-.126 0-.217-.139-.217-.26v-.956c0-.117.086-.213.202-.213h1.584v-1.554c0-.125.082-.231.203-.231h.989c.12 0 .236.108.236.234v1.551h1.555c.125 0 .231.083.231.204v.988Zm5.347.393a.862.862 0 0 1-.869-.855c0-.472.39-.856.869-.856.481 0 .87.384.87.856 0 .471-.389.855-.87.855Zm1.9 1.866a.86.86 0 0 1-.87-.852.86.86 0 0 1 .87-.855c.48 0 .87.38.87.855a.86.86 0 0 1-.87.852Zm0-3.736a.862.862 0 0 1-.87-.854c0-.472.39-.856.87-.856s.87.384.87.856a.862.862 0 0 1-.87.854Zm1.899 1.87a.862.862 0 0 1-.868-.855c0-.472.389-.856.868-.856s.868.384.868.856a.862.862 0 0 1-.868.855Z"/></g></svg></div>
+                <div class="pc-inner"><div class="pc-name">Advanced</div><div class="pc-price" id="p-advanced">$12/mo</div><div class="pc-save" id="sv-advanced">2 months free</div></div>
+              </div>
+              <div class="pc" data-plan="pro">
+                <div class="pc-icon-row"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="none" fill-rule="evenodd"><circle cx="20" cy="20" r="20" fill="#483EFF"/><path fill="#FFF" fill-rule="nonzero" d="M26.666 13H13.334A3.333 3.333 0 0 0 10 16.333v7.193a3.447 3.447 0 0 0 2.14 3.24c1.238.5 2.656.182 3.56-.8L18.52 23h2.96l2.82 2.966a3.2 3.2 0 0 0 3.56.8 3.447 3.447 0 0 0 2.14-3.24v-7.193A3.333 3.333 0 0 0 26.666 13Zm-9.333 6H16v1.333a.667.667 0 0 1-1.333 0V19h-1.333a.667.667 0 0 1 0-1.334h1.333v-1.333a.667.667 0 1 1 1.333 0v1.333h1.333a.667.667 0 1 1 0 1.334Zm7.333 2a2.667 2.667 0 1 1 0-5.333 2.667 2.667 0 0 1 0 5.333ZM26 18.333a1.333 1.333 0 1 1-2.667 0 1.333 1.333 0 0 1 2.667 0Z"/></g></svg></div>
+                <div class="pc-inner"><div class="pc-name">Pro</div><div class="pc-price" id="p-pro">$15/mo</div><div class="pc-save" id="sv-pro">2 months free</div></div>
+              </div>
+            </div>
+            <div class="tog-row">
+              <span class="tog-lbl on" id="lm">Monthly</span>
+              <div class="toggle" id="tog" role="switch" aria-checked="false" tabindex="0"><div class="tog-thumb"></div></div>
+              <span class="tog-lbl" id="ly">Yearly</span>
+            </div>
+          </div>
+
+          <div class="panel" id="s3">
+            <h1 class="ptitle">Pick add-ons</h1>
+            <p class="psub">Add-ons help enhance your gaming experience.</p>
+            <div class="addon-list">
+              <div class="ac" data-a="online"><div class="achk"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" style="display:none"><path fill="none" stroke="#FFF" stroke-width="2" d="m1 4 3.433 3.433L10.866 1"/></svg></div><div class="ac-info"><div class="ac-name">Online service</div><div class="ac-desc">Access to multiplayer games</div></div><div class="ac-price" id="ap-online">+$1/mo</div></div>
+              <div class="ac" data-a="storage"><div class="achk"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" style="display:none"><path fill="none" stroke="#FFF" stroke-width="2" d="m1 4 3.433 3.433L10.866 1"/></svg></div><div class="ac-info"><div class="ac-name">Larger storage</div><div class="ac-desc">Extra 1TB of cloud save</div></div><div class="ac-price" id="ap-storage">+$2/mo</div></div>
+              <div class="ac" data-a="profile"><div class="achk"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" style="display:none"><path fill="none" stroke="#FFF" stroke-width="2" d="m1 4 3.433 3.433L10.866 1"/></svg></div><div class="ac-info"><div class="ac-name">Customisable profile</div><div class="ac-desc">Custom theme on your profile</div></div><div class="ac-price" id="ap-profile">+$2/mo</div></div>
+            </div>
+          </div>
+
+          <div class="panel" id="s4">
+            <h1 class="ptitle">Finishing up</h1>
+            <p class="psub">Double-check everything looks OK before confirming.</p>
+            <div class="sum-box">
+              <div class="sum-top">
+                <div><div class="sum-plan" id="sum-name">Arcade (Monthly)</div><span class="sum-change" id="sum-chg">Change</span></div>
+                <div class="sum-plan-price" id="sum-pp">$9/mo</div>
+              </div>
+              <div class="sum-div"></div>
+              <div id="sum-addons"></div>
+            </div>
+            <div class="total-row">
+              <span class="total-lbl" id="sum-period">Total (per month)</span>
+              <span class="total-val" id="sum-total">+$9/mo</span>
+            </div>
+          </div>
+
+          <div class="conf" id="conf">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g fill="none"><circle cx="40" cy="40" r="40" fill="#F9818E"/><path fill="#E96170" d="M48.464 79.167c.768-.15 1.53-.321 2.288-.515a40.04 40.04 0 0 0 3.794-1.266 40.043 40.043 0 0 0 3.657-1.63 40.046 40.046 0 0 0 12.463-9.898A40.063 40.063 0 0 0 78.3 51.89c.338-1.117.627-2.249.867-3.391L55.374 24.698a21.6 21.6 0 0 0-15.332-6.365 21.629 21.629 0 0 0-15.344 6.365c-8.486 8.489-8.486 22.205 0 30.694l23.766 23.775Z"/><path fill="#FFF" d="M40.003 18.333a21.58 21.58 0 0 1 15.31 6.351c8.471 8.471 8.471 22.158 0 30.63-8.47 8.47-22.156 8.47-30.627 0-8.47-8.472-8.47-22.159 0-30.63a21.594 21.594 0 0 1 15.317-6.35Zm9.865 15c-.316.028-.622.15-.872.344l-12.168 9.13-5.641-5.642c-1.224-1.275-3.63 1.132-2.356 2.356l6.663 6.663c.56.56 1.539.63 2.173.156l13.326-9.995c1.122-.816.43-2.993-.956-3.013a1.666 1.666 0 0 0-.17 0Z"/></g></svg>
+            <h2 style="font-size:28px;font-weight:700;color:#022959">Thank you!</h2>
+            <p>Thanks for confirming your subscription! We hope you have fun using our platform. If you ever need support, please feel free to email us at support@loremgaming.com.</p>
+          </div>
+
         </div>
-    </main>
-  
-    <footer class="attribution">
-        Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
-        Coded by <a href="#">Your Name Here</a>.
-    </footer>
 
-    <script src="script.js"></script>
-</body>
-</html>
+        <!-- DESKTOP NAV (inside card area) -->
+        <div class="desk-nav" id="dnav">
+          <button class="btn-back inv" id="dbbk">Go Back</button>
+          <button class="btn-next" id="dbnx">Next Step</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE NAV (fixed bottom bar) -->
+  <div class="mob-nav" id="mnav">
+    <button class="btn-back inv" id="mbbk">Go Back</button>
+    <button class="btn-next" id="mbnx">Next Step</button>
+  </div>
+
+</div>
+
+<script>
+const pp={arcade:{mo:9,yr:90},advanced:{mo:12,yr:120},pro:{mo:15,yr:150}};
+const ap={online:{mo:1,yr:10},storage:{mo:2,yr:20},profile:{mo:2,yr:20}};
+const an={online:'Online service',storage:'Larger storage',profile:'Customisable profile'};
+const st={step:1,plan:'arcade',yr:false,addons:new Set()};
+
+function suf(){return st.yr?'/yr':'/mo';}
+
+function updPrices(){
+  ['arcade','advanced','pro'].forEach(p=>{
+    document.getElementById('p-'+p).textContent='$'+(st.yr?pp[p].yr:pp[p].mo)+suf();
+    document.getElementById('sv-'+p).style.display=st.yr?'block':'none';
+  });
+  ['online','storage','profile'].forEach(a=>{
+    document.getElementById('ap-'+a).textContent='+$'+(st.yr?ap[a].yr:ap[a].mo)+suf();
+  });
+}
+
+function buildSummary(){
+  const pv=st.yr?pp[st.plan].yr:pp[st.plan].mo;
+  let tot=pv;
+  document.getElementById('sum-name').textContent=st.plan.charAt(0).toUpperCase()+st.plan.slice(1)+' ('+(st.yr?'Yearly':'Monthly')+')';
+  document.getElementById('sum-pp').textContent='$'+pv+suf();
+  document.getElementById('sum-period').textContent='Total (per '+(st.yr?'year':'month')+')';
+  const el=document.getElementById('sum-addons');
+  el.innerHTML='';
+  st.addons.forEach(a=>{
+    const v=st.yr?ap[a].yr:ap[a].mo;
+    tot+=v;
+    const r=document.createElement('div');
+    r.className='sum-addon-row';
+    r.innerHTML='<span class="sum-aname">'+an[a]+'</span><span class="sum-aprice">+$'+v+suf()+'</span>';
+    el.appendChild(r);
+  });
+  document.getElementById('sum-total').textContent='+$'+tot+suf();
+}
+
+function goStep(n){
+  st.step=n;
+  const isConf=n===5;
+
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('conf').classList.toggle('active',isConf);
+  if(!isConf){const p=document.getElementById('s'+n);if(p)p.classList.add('active');}
+
+  // desktop sidebar
+  document.querySelectorAll('.si').forEach((el,i)=>{el.classList.toggle('active',i+1===n||(isConf&&i+1===4));});
+  // mobile step nums
+  [1,2,3,4].forEach(i=>{
+    const el=document.getElementById('mn'+i);
+    if(el) el.classList.toggle('active',i===n||(isConf&&i===4));
+  });
+
+  // nav visibility
+  const showNav=!isConf;
+  document.getElementById('dnav').style.display=showNav?'flex':'none';
+  document.getElementById('mnav').style.display=showNav?'flex':'none';
+
+  ['dbbk','mbbk'].forEach(id=>document.getElementById(id).classList.toggle('inv',n===1));
+  ['dbnx','mbnx'].forEach(id=>{
+    const b=document.getElementById(id);
+    b.textContent=n===4?'Confirm':'Next Step';
+    b.classList.toggle('confirm',n===4);
+  });
+
+  if(n===4) buildSummary();
+}
+
+function val1(){
+  let ok=true;
+  [['fn','en',v=>v.trim().length>0],['fe','ee',v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)],['fp','ep',v=>v.trim().length>0]].forEach(([fi,ei,test])=>{
+    const inp=document.getElementById(fi),err=document.getElementById(ei),valid=test(inp.value);
+    inp.classList.toggle('err',!valid);
+    err.style.display=valid?'none':'inline';
+    if(!valid) ok=false;
+  });
+  return ok;
+}
+
+function next(){if(st.step===1&&!val1())return;if(st.step<4)goStep(st.step+1);else goStep(5);}
+function back(){if(st.step>1)goStep(st.step-1);}
+
+document.getElementById('dbnx').addEventListener('click',next);
+document.getElementById('mbnx').addEventListener('click',next);
+document.getElementById('dbbk').addEventListener('click',back);
+document.getElementById('mbbk').addEventListener('click',back);
+document.getElementById('sum-chg').addEventListener('click',()=>goStep(2));
+
+document.getElementById('tog').addEventListener('click',()=>{
+  st.yr=!st.yr;
+  const tog=document.getElementById('tog');
+  tog.classList.toggle('yr',st.yr);
+  tog.setAttribute('aria-checked',st.yr);
+  document.getElementById('lm').classList.toggle('on',!st.yr);
+  document.getElementById('ly').classList.toggle('on',st.yr);
+  updPrices();
+});
+document.getElementById('tog').addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();document.getElementById('tog').click();}});
+
+document.querySelectorAll('.pc').forEach(c=>{
+  c.addEventListener('click',()=>{
+    st.plan=c.dataset.plan;
+    document.querySelectorAll('.pc').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel');
+  });
+});
+
+document.querySelectorAll('.ac').forEach(c=>{
+  c.addEventListener('click',()=>{
+    const a=c.dataset.a,chk=c.querySelector('.achk svg');
+    if(st.addons.has(a)){st.addons.delete(a);c.classList.remove('sel');chk.style.display='none';}
+    else{st.addons.add(a);c.classList.add('sel');chk.style.display='block';}
+  });
+});
+
+updPrices();
+</script>
